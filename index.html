@@ -4,7 +4,6 @@
 <title>CG4 Notes Portal</title>
 
 <style>
-
 body{
 font-family: Arial;
 background:#f4f4f4;
@@ -50,7 +49,6 @@ background:#333;
 margin-top:15px;
 color:red;
 }
-
 </style>
 
 </head>
@@ -97,7 +95,7 @@ document.getElementById("message").innerText="Access Granted";
 
 setTimeout(function(){
 
-window.location.href="portal.html";
+window.location.href="portal.html?plan="+data.plan+"&level="+data.level;
 
 },1000);
 
