@@ -1,99 +1,117 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CG4 Notes Portal</title>
+
 <style>
-body{font-family:Arial,Helvetica,sans-serif;background:#0f172a;color:white;margin:0}
-header{padding:20px;background:#020617;border-bottom:1px solid #1e293b}
-h1{margin:0;font-size:22px}
-.container{max-width:900px;margin:auto;padding:30px}
-.card{background:#020617;border:1px solid #1e293b;border-radius:10px;padding:25px}
-input{width:100%;padding:12px;margin-top:10px;margin-bottom:15px;border-radius:6px;border:1px solid #334155;background:#020617;color:white}
-button{padding:12px 18px;border:none;border-radius:6px;background:#3b82f6;color:white;cursor:pointer}
-button:hover{background:#2563eb}
-.viewer{margin-top:25px;border:1px solid #334155;height:500px;background:black;display:none}
-.watermark{position:absolute;opacity:0.15;font-size:40px;pointer-events:none}
-.footer{margin-top:40px;font-size:13px;color:#94a3b8;text-align:center}
-</style>
-</head>
-<body><header>
-<h1>CG4 Notes Portal</h1>
-</header><div class="container"><div class="card" id="loginCard">
-<h2>Student Login</h2>
-<p>Enter your email and access key to view your notes.</p><input type="email" id="email" placeholder="Email Address">
-<input type="password" id="key" placeholder="Access Key"><button onclick="login()">Access Notes</button>
 
-<p id="status"></p>
-</div><div class="viewer" id="viewer">
-<iframe src="" id="pdfFrame" width="100%" height="100%" style="border:none"></iframe>
-</div></div><div class="footer">
-CG4 Academic Series — Licensed access only
-</div><script>
-
-// Example demo credentials
-const database = [
-{
-email:"demo@student.com",
-key:"CG4-LAW301-8291",
-pdf:"https://drive.google.com/file/d/1/view"
+body{
+font-family: Arial;
+background:#f4f4f4;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
 }
-]
+
+.box{
+background:white;
+padding:40px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+width:320px;
+text-align:center;
+}
+
+input{
+width:100%;
+padding:10px;
+margin-top:10px;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+button{
+width:100%;
+padding:10px;
+margin-top:15px;
+background:#000;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#333;
+}
+
+#message{
+margin-top:15px;
+color:red;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>CG4 Notes Portal</h2>
+
+<input id="email" placeholder="Email">
+
+<input id="key" placeholder="Access Key">
+
+<button onclick="login()">Login</button>
+
+<div id="message"></div>
+
+</div>
+
+<script>
 
 function login(){
 
-let email=document.getElementById("email").value
-let key=document.getElementById("key").value
-let status=document.getElementById("status")
+var email=document.getElementById("email").value;
+var key=document.getElementById("key").value;
 
-let user=database.find(u=>u.email===email && u.key===key)
+var url="https://script.google.com/macros/s/AKfycbzXP3XYZrksjyCC-353Ao0mH7aL6Y-O39yfrfcpbbxn4htDoiZ8AV881j3yDDZkweqg/exec";
 
-if(user){
-
-status.innerText="Access granted"
-
-let viewer=document.getElementById("viewer")
-viewer.style.display="block"
-
-let frame=document.getElementById("pdfFrame")
-frame.src=user.pdf
-
-addWatermark(email)
-
-}
-else{
-
-status.innerText="Invalid email or access key"
-
-}
-
-}
-
-function addWatermark(email){
-
-let wm=document.createElement("div")
-wm.className="watermark"
-wm.innerText="Licensed to " + email
-wm.style.top="50%"
-wm.style.left="50%"
-
-viewer.appendChild(wm)
-
-}
-
-// Disable right click
-
-document.addEventListener("contextmenu",e=>e.preventDefault())
-
-// Basic screenshot deterrent
-
-document.addEventListener("keydown",function(e){
-
-if(e.key==="PrintScreen"){
-alert("Screenshots are disabled on this portal")
-}
-
+fetch(url,{
+method:"POST",
+body:new URLSearchParams({
+email:email,
+accessKey:key
 })
+})
+.then(res=>res.json())
+.then(data=>{
 
-</script></body>
+if(data.status=="granted"){
+
+document.getElementById("message").style.color="green";
+document.getElementById("message").innerText="Access Granted";
+
+setTimeout(function(){
+
+window.location.href="portal.html";
+
+},1000);
+
+}else{
+
+document.getElementById("message").innerText=data.message;
+
+}
+
+});
+
+}
+
+</script>
+
+</body>
 </html>
