@@ -8,7 +8,6 @@ body{
   font-family: Arial;
   background:#f4f4f4;
   margin:0;
-  padding:0;
 }
 
 .header{
@@ -58,6 +57,7 @@ body{
   font-weight:bold;
 }
 </style>
+
 </head>
 
 <body>
@@ -69,7 +69,6 @@ body{
 <div class="container">
 
   <div id="status">Loading your notes...</div>
-
   <div id="notes"></div>
 
 </div>
@@ -79,30 +78,29 @@ body{
 // 🔑 YOUR WEB APP URL
 var API_URL = "https://script.google.com/macros/s/AKfycbzXP3XYZrksjyCC-353Ao0mH7aL6Y-O39yfrfcpbbxn4htDoiZ8AV881j3yDDZkweqg/exec";
 
-// Get data from URL
-var params = new URLSearchParams(window.location.search);
+// ✅ Get user from localStorage
+var user = JSON.parse(localStorage.getItem("cg4user"));
 
-var level = params.get("level");
-var plan = params.get("plan");
-var courses = params.get("courses");
-
-// If courses not passed, fallback (important)
-if(!courses){
-  document.getElementById("status").innerText = "No course data found. Please login again.";
+// ❌ If no session → force login
+if(!user){
+  document.getElementById("status").innerText = "Session expired. Please login again.";
+  setTimeout(function(){
+    window.location.href = "index.html";
+  },1500);
 }else{
-
-  loadNotes();
-
+  loadNotes(user);
 }
 
-function loadNotes(){
+
+// 🔥 Load notes from API
+function loadNotes(user){
 
   fetch(API_URL,{
     method:"POST",
     body:new URLSearchParams({
       action:"getNotes",
-      level:level,
-      courses:courses
+      level:user.level,
+      courses:user.courses.join(",")
     })
   })
   .then(res=>res.json())
@@ -119,6 +117,8 @@ function loadNotes(){
 
 }
 
+
+// 🎯 Display notes
 function displayNotes(notes){
 
   var container = document.getElementById("notes");
