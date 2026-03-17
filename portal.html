@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CG4 Notes Portal</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f4f4;
+padding:40px;
+}
+
+h1{
+text-align:center;
+}
+
+.course{
+background:white;
+padding:20px;
+margin:15px 0;
+border-radius:8px;
+box-shadow:0 0 8px rgba(0,0,0,0.1);
+}
+
+.course h3{
+margin-top:0;
+}
+
+.note{
+margin:5px 0;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>CG4 Notes Portal</h1>
+
+<div id="courses"></div>
+
+<script>
+
+const API="https://script.google.com/macros/s/AKfycbzXP3XYZrksjyCC-353Ao0mH7aL6Y-O39yfrfcpbbxn4htDoiZ8AV881j3yDDZkweqg/exec"
+
+function getUser(){
+
+let user=localStorage.getItem("cg4user")
+
+if(!user){
+alert("Session expired. Please login again.")
+window.location.href="index.html"
+}
+
+return JSON.parse(user)
+
+}
+
+function loadCourses(){
+
+let user=getUser()
+
+let level=user.level
+let plan=user.plan
+let courses=user.courses
+
+let container=document.getElementById("courses")
+
+container.innerHTML=""
+
+if(plan=="Free Plan"){
+
+for(let i=0;i<courses.length;i++){
+
+if(courses[i]!=""){
+
+container.innerHTML+=`
+
+<div class="course">
+
+<h3>${courses[i]}</h3>
+
+<div class="note">
+<a href="#">Lecture Note 1</a>
+</div>
+
+<div class="note">
+<a href="#">Lecture Note 2</a>
+</div>
+
+<div class="note">
+<a href="#">Lecture Note 3</a>
+</div>
+
+</div>
+
+`
+
+break
+
+}
+
+}
+
+}else{
+
+for(let i=0;i<courses.length;i++){
+
+if(courses[i]!=""){
+
+container.innerHTML+=`
+
+<div class="course">
+
+<h3>${courses[i]}</h3>
+
+<div class="note">
+<a href="#">Lecture Note 1</a>
+</div>
+
+<div class="note">
+<a href="#">Lecture Note 2</a>
+</div>
+
+<div class="note">
+<a href="#">Lecture Note 3</a>
+</div>
+
+</div>
+
+`
+
+}
+
+}
+
+}
+
+}
+
+loadCourses()
+
+</script>
+
+</body>
+</html>
