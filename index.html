@@ -4,7 +4,6 @@
 <title>CG4 Notes Portal</title>
 
 <style>
-
 body{
 font-family:Arial;
 background:#f4f4f4;
@@ -13,7 +12,6 @@ justify-content:center;
 align-items:center;
 height:100vh;
 }
-
 .box{
 background:white;
 padding:40px;
@@ -22,7 +20,6 @@ box-shadow:0 0 10px rgba(0,0,0,0.1);
 width:320px;
 text-align:center;
 }
-
 input{
 width:100%;
 padding:10px;
@@ -30,7 +27,6 @@ margin-top:10px;
 border:1px solid #ccc;
 border-radius:5px;
 }
-
 button{
 width:100%;
 padding:10px;
@@ -41,16 +37,13 @@ border:none;
 border-radius:5px;
 cursor:pointer;
 }
-
 button:hover{
 background:#333;
 }
-
 #message{
 margin-top:15px;
 color:red;
 }
-
 </style>
 
 </head>
@@ -58,35 +51,30 @@ color:red;
 <body>
 
 <div class="box">
-
 <h2>CG4 Notes Portal</h2>
 
 <input id="email" placeholder="Email">
-
 <input id="key" placeholder="Access Key">
 
 <button onclick="login()">Login</button>
 
 <div id="message"></div>
-
 </div>
-
 
 <script>
 
 function login(){
 
-var email=document.getElementById("email").value.trim()
-var key=document.getElementById("key").value.trim()
-
-var message=document.getElementById("message")
+var email = document.getElementById("email").value.trim();
+var key = document.getElementById("key").value.trim();
+var message = document.getElementById("message");
 
 if(email=="" || key==""){
-message.innerText="Please enter Email and Access Key"
-return
+message.innerText="Please enter Email and Access Key";
+return;
 }
 
-var url="https://script.google.com/macros/s/AKfycbzXP3XYZrksjyCC-353Ao0mH7aL6Y-O39yfrfcpbbxn4htDoiZ8AV881j3yDDZkweqg/exec"
+var url="https://script.google.com/macros/s/AKfycbzXP3XYZrksjyCC-353Ao0mH7aL6Y-O39yfrfcpbbxn4htDoiZ8AV881j3yDDZkweqg/exec";
 
 fetch(url,{
 method:"POST",
@@ -95,40 +83,35 @@ email:email,
 accessKey:key
 })
 })
-
 .then(res=>res.json())
-
 .then(data=>{
 
 if(data.status=="granted"){
 
-/* store user session */
+// ✅ store FULL user session
+localStorage.setItem("cg4user", JSON.stringify({
+email: email,
+level: data.level,
+plan: data.plan,
+courses: data.courses
+}));
 
-localStorage.setItem("cg4user",JSON.stringify(data))
-
-message.style.color="green"
-message.innerText="Access Granted"
+message.style.color="green";
+message.innerText="Access Granted";
 
 setTimeout(function(){
-
-window.location.href="portal.html"
-
-},1000)
+window.location.href="portal.html";
+},1000);
 
 }else{
-
-message.style.color="red"
-message.innerText=data.message
-
+message.style.color="red";
+message.innerText=data.message;
 }
 
 })
-
 .catch(function(){
-
-message.innerText="Network error. Try again."
-
-})
+message.innerText="Network error. Try again.";
+});
 
 }
 
