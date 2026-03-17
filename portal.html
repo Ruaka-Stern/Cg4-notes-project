@@ -1,87 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>CG4 Notes Portal</title>
-
-<style>
-body{
-  font-family: Arial;
-  background:#f4f4f4;
-  margin:0;
-}
-
-.header{
-  background:#000;
-  color:white;
-  padding:15px;
-  text-align:center;
-}
-
-.container{
-  padding:20px;
-}
-
-.note{
-  background:white;
-  padding:15px;
-  margin-bottom:15px;
-  border-radius:8px;
-  box-shadow:0 0 5px rgba(0,0,0,0.1);
-}
-
-.note h3{
-  margin:0;
-}
-
-.note p{
-  margin:5px 0;
-  color:#555;
-}
-
-.note a{
-  display:inline-block;
-  margin-top:10px;
-  padding:8px 12px;
-  background:#000;
-  color:white;
-  text-decoration:none;
-  border-radius:5px;
-}
-
-.note a:hover{
-  background:#333;
-}
-
-#status{
-  margin-bottom:20px;
-  font-weight:bold;
-}
-</style>
-
-</head>
-
-<body>
-
-<div class="header">
-  <h2>CG4 Notes Portal</h2>
-</div>
-
-<div class="container">
-
-  <div id="status">Loading your notes...</div>
-  <div id="notes"></div>
-
-</div>
-
 <script>
-
-// 🔑 YOUR WEB APP URL
 var API_URL = "https://script.google.com/macros/s/AKfycbzXP3XYZrksjyCC-353Ao0mH7aL6Y-O39yfrfcpbbxn4htDoiZ8AV881j3yDDZkweqg/exec";
 
-// ✅ Get user from localStorage
 var user = JSON.parse(localStorage.getItem("cg4user"));
 
-// ❌ If no session → force login
 if(!user){
   document.getElementById("status").innerText = "Session expired. Please login again.";
   setTimeout(function(){
@@ -91,20 +12,29 @@ if(!user){
   loadNotes(user);
 }
 
-
-// 🔥 Load notes from API
 function loadNotes(user){
+
+  console.log("USER DATA:", user);
+  console.log("LEVEL:", user.level);
+  console.log("COURSES RAW:", user.courses);
+
+  var cleanCourses = user.courses.map(function(c){
+    return c.toString().trim();
+  });
+
+  console.log("COURSES CLEAN:", cleanCourses);
 
   fetch(API_URL,{
     method:"POST",
     body:new URLSearchParams({
       action:"getNotes",
       level:user.level,
-      courses:user.courses.join(",")
+      courses:cleanCourses.join(",")
     })
   })
   .then(res=>res.json())
   .then(data=>{
+    console.log("API RESPONSE:", data);
 
     if(data.status != "success"){
       document.getElementById("status").innerText = "Failed to load notes.";
@@ -112,13 +42,12 @@ function loadNotes(user){
     }
 
     displayNotes(data.notes);
-
+  })
+  .catch(()=>{
+    document.getElementById("status").innerText = "Network error.";
   });
-
 }
 
-
-// 🎯 Display notes
 function displayNotes(notes){
 
   var container = document.getElementById("notes");
@@ -126,7 +55,7 @@ function displayNotes(notes){
 
   container.innerHTML = "";
 
-  if(notes.length == 0){
+  if(!notes || notes.length === 0){
     status.innerText = "No notes available for your courses.";
     return;
   }
@@ -150,8 +79,4 @@ function displayNotes(notes){
   });
 
 }
-
 </script>
-
-</body>
-</html>
