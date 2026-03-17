@@ -4,143 +4,152 @@
 <title>CG4 Notes Portal</title>
 
 <style>
-
 body{
-font-family:Arial;
-background:#f4f4f4;
-padding:40px;
+  font-family: Arial;
+  background:#f4f4f4;
+  margin:0;
+  padding:0;
 }
 
-h1{
-text-align:center;
+.header{
+  background:#000;
+  color:white;
+  padding:15px;
+  text-align:center;
 }
 
-.course{
-background:white;
-padding:20px;
-margin:15px 0;
-border-radius:8px;
-box-shadow:0 0 8px rgba(0,0,0,0.1);
-}
-
-.course h3{
-margin-top:0;
+.container{
+  padding:20px;
 }
 
 .note{
-margin:5px 0;
+  background:white;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:8px;
+  box-shadow:0 0 5px rgba(0,0,0,0.1);
 }
 
-</style>
+.note h3{
+  margin:0;
+}
 
+.note p{
+  margin:5px 0;
+  color:#555;
+}
+
+.note a{
+  display:inline-block;
+  margin-top:10px;
+  padding:8px 12px;
+  background:#000;
+  color:white;
+  text-decoration:none;
+  border-radius:5px;
+}
+
+.note a:hover{
+  background:#333;
+}
+
+#status{
+  margin-bottom:20px;
+  font-weight:bold;
+}
+</style>
 </head>
 
 <body>
 
-<h1>CG4 Notes Portal</h1>
+<div class="header">
+  <h2>CG4 Notes Portal</h2>
+</div>
 
-<div id="courses"></div>
+<div class="container">
+
+  <div id="status">Loading your notes...</div>
+
+  <div id="notes"></div>
+
+</div>
 
 <script>
 
-const API="https://script.google.com/macros/s/AKfycbzXP3XYZrksjyCC-353Ao0mH7aL6Y-O39yfrfcpbbxn4htDoiZ8AV881j3yDDZkweqg/exec"
+// 🔑 YOUR WEB APP URL
+var API_URL = "https://script.google.com/macros/s/AKfycbzXP3XYZrksjyCC-353Ao0mH7aL6Y-O39yfrfcpbbxn4htDoiZ8AV881j3yDDZkweqg/exec";
 
-function getUser(){
+// Get data from URL
+var params = new URLSearchParams(window.location.search);
 
-let user=localStorage.getItem("cg4user")
+var level = params.get("level");
+var plan = params.get("plan");
+var courses = params.get("courses");
 
-if(!user){
-alert("Session expired. Please login again.")
-window.location.href="index.html"
-}
-
-return JSON.parse(user)
-
-}
-
-function loadCourses(){
-
-let user=getUser()
-
-let level=user.level
-let plan=user.plan
-let courses=user.courses
-
-let container=document.getElementById("courses")
-
-container.innerHTML=""
-
-if(plan=="Free Plan"){
-
-for(let i=0;i<courses.length;i++){
-
-if(courses[i]!=""){
-
-container.innerHTML+=`
-
-<div class="course">
-
-<h3>${courses[i]}</h3>
-
-<div class="note">
-<a href="#">Lecture Note 1</a>
-</div>
-
-<div class="note">
-<a href="#">Lecture Note 2</a>
-</div>
-
-<div class="note">
-<a href="#">Lecture Note 3</a>
-</div>
-
-</div>
-
-`
-
-break
-
-}
-
-}
-
+// If courses not passed, fallback (important)
+if(!courses){
+  document.getElementById("status").innerText = "No course data found. Please login again.";
 }else{
 
-for(let i=0;i<courses.length;i++){
-
-if(courses[i]!=""){
-
-container.innerHTML+=`
-
-<div class="course">
-
-<h3>${courses[i]}</h3>
-
-<div class="note">
-<a href="#">Lecture Note 1</a>
-</div>
-
-<div class="note">
-<a href="#">Lecture Note 2</a>
-</div>
-
-<div class="note">
-<a href="#">Lecture Note 3</a>
-</div>
-
-</div>
-
-`
+  loadNotes();
 
 }
 
-}
+function loadNotes(){
+
+  fetch(API_URL,{
+    method:"POST",
+    body:new URLSearchParams({
+      action:"getNotes",
+      level:level,
+      courses:courses
+    })
+  })
+  .then(res=>res.json())
+  .then(data=>{
+
+    if(data.status != "success"){
+      document.getElementById("status").innerText = "Failed to load notes.";
+      return;
+    }
+
+    displayNotes(data.notes);
+
+  });
 
 }
 
-}
+function displayNotes(notes){
 
-loadCourses()
+  var container = document.getElementById("notes");
+  var status = document.getElementById("status");
+
+  container.innerHTML = "";
+
+  if(notes.length == 0){
+    status.innerText = "No notes available for your courses.";
+    return;
+  }
+
+  status.innerText = "Your Notes";
+
+  notes.forEach(function(note){
+
+    var div = document.createElement("div");
+    div.className = "note";
+
+    div.innerHTML = `
+      <h3>${note.title}</h3>
+      <p>Course Code: ${note.code}</p>
+      <p>Type: ${note.type}</p>
+      <a href="${note.link}" target="_blank">Open Note</a>
+    `;
+
+    container.appendChild(div);
+
+  });
+
+}
 
 </script>
 
